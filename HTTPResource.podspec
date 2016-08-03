@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.version      = "0.0.1"
   s.summary      = "A Value orientated way to describe HTTP resources"
   s.license      = "MIT"
-
+  s.homepage	 = "https://github.com/daniel1of1/HTTPResource"
   s.author             = { "Daniel Haight" => "daniel+code@haight.io" }
   s.social_media_url   = "http://twitter.com/daniel1of1"
 
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = "2.0"
   s.tvos.deployment_target = "9.0"
 
-  s.source       = { :git => "http://github.com/daniel1of1/HTTPResource.git", :tag => "0.0.1" }
+  s.source       = { :git => "https://github.com/daniel1of1/HTTPResource.git", :tag => "0.0.1" }
 
   s.source_files  = "Resource/*.swift"
 
@@ -24,3 +24,4 @@ Pod::Spec.new do |s|
   s.dependency "Result", "~> 2.1.3"
 
 end
+

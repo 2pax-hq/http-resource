@@ -1,0 +1,10 @@
+PODS:
+  - Result (2.1.3)
+
+DEPENDENCIES:
+  - Result
+
+SPEC CHECKSUMS:
+  Result: 18e1a7597fbcca5923c565b40a25a98afafdee02
+
+COCOAPODS: 0.39.0

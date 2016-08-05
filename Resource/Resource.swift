@@ -33,4 +33,18 @@ public extension HTTPResource {
             return parseJSON(json)
         }
     }
+
+    public func request() -> NSURLRequest {
+        return requestFromResource(self)
+    }
+
+}
+
+func requestFromResource<T>(resource: HTTPResource<T>) -> NSURLRequest {
+    let request = NSMutableURLRequest(URL: resource.URL)
+    request.HTTPMethod = resource.method.name
+    if case let .POST(data) = resource.method {
+        request.HTTPBody = data
+    }
+    return request
 }

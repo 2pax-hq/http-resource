@@ -17,7 +17,7 @@ public enum HTTPMethod<Body> {
         }
     }
 
-    func map<U>(f: Body -> U) -> HTTPMethod<U> {
+    public func map<U>(f: Body -> U) -> HTTPMethod<U> {
         switch self {
         case .POST(let body):
             return .POST(f(body))

@@ -34,6 +34,26 @@ public extension HTTPResource {
         }
     }
 
+    public init(URL: NSURL,
+                method: HTTPMethod<JSONDictionary> = .GET,
+                parseJSONCollection: ([JSONDictionary]) -> Result<T,ParseError>,
+                headers: [(String,String)] = [])
+    {
+        self.URL = URL
+        self.headers = headers
+        self.method = method.map { json in
+            try! NSJSONSerialization.dataWithJSONObject(json, options: [])
+        }
+        self.parse = { data in
+            guard let json = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()),
+            let jsonColllection = json as? [JSONDictionary] else {
+                return .Failure(.InvalidJSON)
+            }
+
+            return parseJSONCollection(jsonColllection)
+        }
+    }
+
     public func request() -> NSURLRequest {
         return requestFromResource(self)
     }

@@ -66,5 +66,11 @@ func requestFromResource<T>(resource: HTTPResource<T>) -> NSURLRequest {
     if case let .POST(data) = resource.method {
         request.HTTPBody = data
     }
+    if case let .PUT(data) = resource.method {
+        request.HTTPBody = data
+    }
+    if case let .PATCH(data) = resource.method {
+        request.HTTPBody = data
+    }
     return request
 }

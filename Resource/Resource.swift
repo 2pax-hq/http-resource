@@ -12,14 +12,14 @@ public struct HTTPResource<T> {
     public let URL: NSURL
     public let method: HTTPMethod<NSData>
     public let parse: (NSData) -> Result<T,ParseError>
-    public let headers: [(String,String)]
+    public let headers: [String:String]
 }
 
 public extension HTTPResource {
     public init(URL: NSURL,
          method: HTTPMethod<JSONDictionary> = .GET,
          parseJSON: (JSONDictionary) -> Result<T,ParseError>,
-         headers: [(String,String)] = [])
+         headers: [String:String] = [:])
     {
         self.URL = URL
         self.headers = headers
@@ -37,7 +37,7 @@ public extension HTTPResource {
     public init(URL: NSURL,
                 method: HTTPMethod<JSONDictionary> = .GET,
                 parseJSONCollection: ([JSONDictionary]) -> Result<T,ParseError>,
-                headers: [(String,String)] = [])
+                headers: [String:String] = [:])
     {
         self.URL = URL
         self.headers = headers
@@ -63,6 +63,7 @@ public extension HTTPResource {
 func requestFromResource<T>(resource: HTTPResource<T>) -> NSURLRequest {
     let request = NSMutableURLRequest(URL: resource.URL)
     request.HTTPMethod = resource.method.name
+    request.allHTTPHeaderFields = resource.headers
     if case let .POST(data) = resource.method {
         request.HTTPBody = data
     }

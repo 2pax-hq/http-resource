@@ -21,7 +21,5 @@ Pod::Spec.new do |s|
 
   s.requires_arc = true
 
-  s.dependency "Result", "~> 2.1.3"
-
 end
 

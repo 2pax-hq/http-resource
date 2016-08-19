@@ -1,5 +1,4 @@
 import Foundation
-import Result
 
 public typealias JSONDictionary = AnyObject
 
@@ -11,14 +10,14 @@ public enum ParseError: ErrorType {
 public struct HTTPResource<T> {
     public let URL: NSURL
     public let method: HTTPMethod<NSData>
-    public let parse: (NSData) -> Result<T,ParseError>
+    public let parse: (NSData) throws -> T
     public let headers: [String:String]
 }
 
 public extension HTTPResource {
     public init(URL: NSURL,
          method: HTTPMethod<JSONDictionary> = .GET,
-         parseJSON: (JSONDictionary) -> Result<T,ParseError>,
+         parseJSON: (JSONDictionary) throws -> T,
          headers: [String:String] = [:])
     {
         self.URL = URL
@@ -28,15 +27,15 @@ public extension HTTPResource {
         }
         self.parse = { data in
             guard let json = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()) else {
-                return .Failure(.InvalidJSON)
+                throw ParseError.InvalidJSON
             }
-            return parseJSON(json)
+            return try parseJSON(json)
         }
     }
 
     public init(URL: NSURL,
                 method: HTTPMethod<JSONDictionary> = .GET,
-                parseJSONCollection: ([JSONDictionary]) -> Result<T,ParseError>,
+                parseJSONCollection: ([JSONDictionary]) throws -> T,
                 headers: [String:String] = [:])
     {
         self.URL = URL
@@ -47,10 +46,10 @@ public extension HTTPResource {
         self.parse = { data in
             guard let json = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()),
             let jsonColllection = json as? [JSONDictionary] else {
-                return .Failure(.InvalidJSON)
+                throw ParseError.InvalidJSON
             }
 
-            return parseJSONCollection(jsonColllection)
+            return try parseJSONCollection(jsonColllection)
         }
     }
 

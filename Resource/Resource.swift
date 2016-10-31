@@ -2,75 +2,75 @@ import Foundation
 
 public typealias JSONDictionary = AnyObject
 
-public enum ParseError: ErrorType {
-    case InvalidJSON
-    case Custom(ErrorType?)
+public enum ParseError: Error {
+    case invalidJSON
+    case custom(Error?)
 }
 
 public struct HTTPResource<T> {
-    public let URL: NSURL
-    public let method: HTTPMethod<NSData>
-    public let parse: (NSData) throws -> T
+    public let URL: Foundation.URL
+    public let method: HTTPMethod<Data>
+    public let parse: (Data) throws -> T
     public let headers: [String:String]
 }
 
 public extension HTTPResource {
-    public init(URL: NSURL,
-         method: HTTPMethod<JSONDictionary> = .GET,
-         parseJSON: (JSONDictionary) throws -> T,
+    public init(URL: Foundation.URL,
+         method: HTTPMethod<JSONDictionary> = .get,
+         parseJSON: @escaping (JSONDictionary) throws -> T,
          headers: [String:String] = [:])
     {
         self.URL = URL
         self.headers = headers
         self.method = method.map { json in
-            try! NSJSONSerialization.dataWithJSONObject(json, options: [])
+            try! JSONSerialization.data(withJSONObject: json, options: [])
         }
         self.parse = { data in
-            guard let json = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()) else {
-                throw ParseError.InvalidJSON
+            guard let json = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions()) else {
+                throw ParseError.invalidJSON
             }
-            return try parseJSON(json)
+            return try parseJSON(json as JSONDictionary)
         }
     }
 
-    public init(URL: NSURL,
-                method: HTTPMethod<JSONDictionary> = .GET,
-                parseJSONCollection: ([JSONDictionary]) throws -> T,
+    public init(URL: Foundation.URL,
+                method: HTTPMethod<JSONDictionary> = .get,
+                parseJSONCollection: @escaping ([JSONDictionary]) throws -> T,
                 headers: [String:String] = [:])
     {
         self.URL = URL
         self.headers = headers
         self.method = method.map { json in
-            try! NSJSONSerialization.dataWithJSONObject(json, options: [])
+            try! JSONSerialization.data(withJSONObject: json, options: [])
         }
         self.parse = { data in
-            guard let json = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()),
+            guard let json = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions()),
             let jsonColllection = json as? [JSONDictionary] else {
-                throw ParseError.InvalidJSON
+                throw ParseError.invalidJSON
             }
 
             return try parseJSONCollection(jsonColllection)
         }
     }
 
-    public func request() -> NSURLRequest {
+    public func request() -> URLRequest {
         return requestFromResource(self)
     }
 
 }
 
-func requestFromResource<T>(resource: HTTPResource<T>) -> NSURLRequest {
-    let request = NSMutableURLRequest(URL: resource.URL)
-    request.HTTPMethod = resource.method.name
+func requestFromResource<T>(_ resource: HTTPResource<T>) -> URLRequest {
+    let request = NSMutableURLRequest(url: resource.URL)
+    request.httpMethod = resource.method.name
     request.allHTTPHeaderFields = resource.headers
-    if case let .POST(data) = resource.method {
-        request.HTTPBody = data
+    if case let .post(data) = resource.method {
+        request.httpBody = data
     }
-    if case let .PUT(data) = resource.method {
-        request.HTTPBody = data
+    if case let .put(data) = resource.method {
+        request.httpBody = data
     }
-    if case let .PATCH(data) = resource.method {
-        request.HTTPBody = data
+    if case let .patch(data) = resource.method {
+        request.httpBody = data
     }
-    return request
+    return request as URLRequest
 }

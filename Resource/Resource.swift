@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias JSONDictionary = AnyObject
+public typealias JSONDictionary = Any
 
 public enum ParseError: ErrorType {
     case InvalidJSON
